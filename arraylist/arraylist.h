@@ -1,3 +1,4 @@
+#include "string"
 template<class T>
 class ArrayList{
 private:
@@ -5,16 +6,20 @@ private:
     int size;
     int top;
     void arraycopye(T *toarr, T *originarr,int langth);
+    int getpos(const T & val,int pos)const;
 public:
     ArrayList();
     ~ArrayList();
+    const T & operator[](int i)const; //beta edition
+    T &operator[](int i);
     void append(T val);
     void pop_back();
     T* back();
     T* get(int index);
+    int get(const T & val);
     void clear();
     void replace(int index,T val);
-    void printarray();
+    std::string printarray();
     int getSize();
     T* getArr();
     T* getArr(int begin,int end);
@@ -108,12 +113,13 @@ void ArrayList<T>::replace(int index,T val)
     
 }
 template <class T>
-void ArrayList<T>::printarray()
+std::string ArrayList<T>::printarray()
 {
     for(size_t i=0;i<top;i++){
-        // cout<<
+        std::cout<<arr[i];       
     }
     std::cout<<std::endl;
+    return "";
 }
 template <class T>
 int ArrayList<T>::getSize()
@@ -165,4 +171,56 @@ void ArrayList<T>::deleteEle(int index){
         arr[i]=arr[i+1];
     }
     top--;
+}
+
+template <class T>
+int ArrayList<T>::get(const T &val)
+{
+    int pos=0;
+    return this->getpos(val,pos);
+}
+
+template <class T>
+int ArrayList<T>::getpos(const T &val, int pos)const
+{
+    if (pos<top)
+    {
+        if (val==arr[pos])
+        {
+            return pos;
+        }
+        int left=this->getpos(val,2*pos+1);
+        int right=this->getpos(val,2*pos+2);
+        if (left>=0)
+        {
+            return left;
+        }else if (right>=0)
+        {
+            return right;
+        }
+    }
+    return -1;
+}
+
+//beta edition
+template <class T>
+const T & ArrayList<T>::operator[](int i) const
+{
+    if (i<top&&i>=0)
+    {
+        return arr[i];
+    }
+    throw "index out of range";
+    // return arr[0];
+    
+}
+
+template <class T>
+T &ArrayList<T>::operator[](int i)
+{
+    if (i<top&&i>=0)
+    {
+        return arr[i];
+    }
+    throw "index out of range";
 }

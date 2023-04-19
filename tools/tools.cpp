@@ -2,18 +2,19 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include "tools.h"
 namespace ctools
 {
-    struct none
-    {};
+    struct none{};
     template<class T>
     std::map<T,none> *arrayTomap(T *src,int langth){
         std::map<T,none> *resmap=new std::map<T,none>;
+        none newnone;
         for (int i = 0; i < langth; i++)
         {
             if (resmap->count(src[i])==0)
             {
-                none newnone;
+                
                 resmap->insert({src[i],newnone});
             }else{
                 throw "array repeat";

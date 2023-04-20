@@ -3,11 +3,13 @@
 #include <vector>
 #include <iostream>
 #include <cstring>
+#include <string>
 #include "tools.h"
 namespace ctools
 {
+    //need handle destory the result map
     template<class T>
-    std::map<T,none> *arrayTomap(T *src,int langth){
+    std::map<T,none> *arrayTomap(const T *src,int langth){
         std::map<T,none> *resmap=new std::map<T,none>;
         none newnone;
         for (int i = 0; i < langth; i++)
@@ -83,6 +85,7 @@ namespace ctools
         delete origin;
         
     }
+    //need handl destory the pointer char*[]
     char **getfilename(char *filename)
     {
         bool isrecord=false;
@@ -110,9 +113,44 @@ namespace ctools
                 }
             }
         }
-        char *namearr[2];
+        char **namearr=new char*[2];
         namearr[0]=realname;
         namearr[1]=prix;
         return namearr;
     }
+    //wordcount,result write to output
+    void wordcount(const char *src, const std::map<char,none> &delim, std::map<std::string, int> &output)
+    {
+        using namespace std;
+        bool isrecord=false;string op="";
+        if(strlen(src)==0) return;
+        for(int i=0;i<strlen(src);i++){
+            if(delim.count(src[i])!=0){
+                //meet delim char
+                if(isrecord){
+                    if(output.count(op)==0){
+                        output.insert({op,1});
+                    }else{
+                        output.at(op)++;
+                    }
+                    isrecord=false;
+                    op="";
+                }
+            }else{
+                if(!isrecord){
+                    isrecord=true;
+                }
+                op+=src[i];
+            }
+        }
+        //check the op
+        if(op.length()>0){
+            if(output.count(op)==0){
+                output.insert({op,1});
+            }else{
+                output.at(op)++;
+            }
+        }
+    }
+
 } // namespace ctools

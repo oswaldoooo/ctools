@@ -2,10 +2,10 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <cstring>
 #include "tools.h"
 namespace ctools
 {
-    struct none{};
     template<class T>
     std::map<T,none> *arrayTomap(T *src,int langth){
         std::map<T,none> *resmap=new std::map<T,none>;
@@ -82,5 +82,37 @@ namespace ctools
         }
         delete origin;
         
+    }
+    char **getfilename(char *filename)
+    {
+        bool isrecord=false;
+        char prix[8];
+        char realname[strlen(filename)];
+        std::fill(prix,prix+8,'\0');
+        int start=0;
+        for(int i=0;i<strlen(filename);i++){
+            if(filename[i]=='.'){
+                if(!isrecord){
+                    isrecord=true;
+                    start=0;
+                }else{
+                    throw "filename format dont support";
+                }
+            }else{
+                if(isrecord){
+                    //record prix
+                    prix[start]=filename[i];
+                    start++;
+                }else{
+                    //record filename
+                    realname[start]=filename[i];
+                    start++;
+                }
+            }
+        }
+        char *namearr[2];
+        namearr[0]=realname;
+        namearr[1]=prix;
+        return namearr;
     }
 } // namespace ctools

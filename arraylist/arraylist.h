@@ -1,10 +1,13 @@
+#pragma once
+#ifndef arraylist_h
+#define arraylist_h
 #include "string"
 #include <iostream>
+#include <iterator>
 namespace ctools
 {
     template<class T>
     class ArrayList{
-    typedef T* iterator;
     private:
         T* arr;
         int size;
@@ -32,8 +35,8 @@ namespace ctools
         void deleteEle(int index);
         void setAllInfo(T* arr_,int container_size,int top_);
         ArrayList* getArray(int begin,int end);
-        iterator begin();
-        iterator end();
+        std::output_iterator_tag begin();
+        std::output_iterator_tag end();
     };
 } // namespace ctools
-
+#endif

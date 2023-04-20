@@ -1,5 +1,6 @@
-#pragma onece;
 #include "arraylist.h"
+// #include <iterator>
+
 using namespace ctools;
 template<class T>
 void arraylistcopy(ArrayList<T>* dst,ArrayList<T>* src);
@@ -157,9 +158,9 @@ ArrayList<T> *ArrayList<T>::getArray(int begin, int end)
 }
 
 template <class T>
-iterator ctools::ArrayList<T>::begin()
+std::output_iterator_tag ctools::ArrayList<T>::begin()
 {
-    return iterator();
+    return std::output_iterator_tag();
 }
 
 template<class T>

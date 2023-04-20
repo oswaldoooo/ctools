@@ -5,11 +5,12 @@
 #include <vector>
 namespace ctools
 {
-    struct none;
+    struct none{};
     template<class T>
     std::map<T,none> *arrayTomap(T *src,int langth);
     void printVector(std::vector<char*> *src);
     std::vector<char*> *fitter_str(char* src,char* sym);
     void deleteStr(std::vector<char*> *origin);
+    char **getfilename(char *filename);
 } // namespace ctools
 #endif

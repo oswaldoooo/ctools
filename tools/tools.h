@@ -4,9 +4,16 @@
 #include <map>
 #include <vector>
 #include <string>
+#include "/home/dev/error/error.h"
 namespace ctools
 {
     struct none{};
+    template<class T>
+    struct RETURN
+    {
+        T object;
+        error errs;
+    };
     template<class T>
     std::map<T,none> *arrayTomap(const T *src,int langth);
     void printVector(std::vector<char*> *src);

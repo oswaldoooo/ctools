@@ -21,3 +21,18 @@ arr.deleteEle(index);//delete the index element
 int* newarr=new int[10];
 arr.setAllInfo(newarr,10,0);//custom the array by yourself
 ```
+### **Parser**
+```cpp
+char start[]="/*";
+char end[]="*/";
+char testwords[]="/* hello im a test sentence */";
+string testwords_str=testwords;
+parser pr(start,end);
+vector<string> res=pr.parsecontent(testwords);
+vector<string> restwo=pr.parsecontent(testwords_str);
+
+char *ans;char delims[]="/*";
+ans=parsecontent(testwords,delims);//it'll return hello im a test sentence
+vector<string> newres=parsecontentplus(testwords,delims);//it'll return {hello im a test sentence}
+map<string,int> newresmap=parsecontentplusplus(testwords,delims);//it will return {hello im a test sentence : 1}
+```

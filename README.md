@@ -36,3 +36,13 @@ ans=parsecontent(testwords,delims);//it'll return hello im a test sentence
 vector<string> newres=parsecontentplus(testwords,delims);//it'll return {hello im a test sentence}
 map<string,int> newresmap=parsecontentplusplus(testwords,delims);//it will return {hello im a test sentence : 1}
 ```
+### **error**
+```cpp
+error errone;//create an empty error
+error errtwo("im wrong");//create an error with something
+errone.join("a new wrong");//join something in error
+errone.join(errtwo);//join another erro into this error
+errone.clear();//clear this error
+errone.String();//output error's content 
+
+```

@@ -152,4 +152,47 @@ namespace ctools
         }
     }
 
+    std::vector<std::string> spilt(const char *origin, const char *delim)
+    {
+        using namespace std;
+        vector<string> res;
+        int langth=strlen(delim);
+        bool isrecord=false;
+        if(strlen(origin)<=langth){
+            return res;
+        }
+        char *tem=new char[langth];
+        std::string buffer="";
+        for(int i=0;i<strlen(origin);i++){
+            if(origin[i]==delim[0]&&(strlen(origin)-i)>=langth){
+                strncpy(tem,origin+i,langth);
+                if (strncmp(tem,delim,strlen(delim))==0){
+                    if(isrecord){
+                        isrecord=false;
+                        if(buffer.length()>0){
+                            res.push_back(buffer);
+                            buffer="";
+                        }
+                    }
+                }else{
+                    if(!isrecord){
+                        std::cout<<"open record switch"<<std::endl;
+                        isrecord=true;
+                    }
+                    buffer+=origin[i];
+                }
+            }else{
+                if(!isrecord){
+                    isrecord=true;
+                }
+                buffer+=origin[i];
+            }
+        }
+        if(isrecord){
+            res.push_back(buffer);
+        }
+        delete[] tem;
+        return res;
+    }
+
 } // namespace ctools

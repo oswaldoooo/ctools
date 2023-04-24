@@ -1,6 +1,7 @@
+#include <mutex>
 #include "arraylist.h"
 // #include <iterator>
-
+std::mutex mt;
 using namespace ctools;
 template<class T>
 void arraylistcopy(ArrayList<T>* dst,ArrayList<T>* src);
@@ -46,6 +47,7 @@ ArrayList<T>::~ArrayList()
 template <class T>
 void ArrayList<T>::append(T val)
 {
+    std::lock_guard lg(mt);//add lock
     if (top>=size)
     {
         size=size*2;
@@ -60,6 +62,7 @@ void ArrayList<T>::append(T val)
 template <class T>
 void ArrayList<T>::pop_back()
 {
+    std::lock_guard lg(mt);
     top--;
 }
 template <class T>
@@ -80,6 +83,7 @@ T* ArrayList<T>::get(int index)
 template <class T>
 void ArrayList<T>::clear()
 {
+    std::lock_guard lg(mt);
     delete[] arr;
     arr=new T[5];
 }
@@ -88,6 +92,7 @@ void ArrayList<T>::replace(int index,T val)
 {
     if (index<top)
     {
+        std::lock_guard lg(mt);
         arr[index]=val;
     }
     
@@ -169,6 +174,7 @@ void arraylistcopy(ArrayList<T> *dst, ArrayList<T> *src) {
 }
 template<class T>
 void ArrayList<T>::deleteEle(int index){
+    std::lock_guard lg(mt);
     for (int i=index; i<top-1; i++) {
         arr[i]=arr[i+1];
     }

@@ -9,10 +9,10 @@ namespace ctools
 {
     struct none{};
     template<class T>
-    struct RETURN
+    struct Ans
     {
         T object;
-        error errs;
+        error err;
     };
     template<class T>
     std::map<T,none> *arrayTomap(const T *src,int langth);

@@ -22,7 +22,7 @@ void error::join(const error &_err)
 
 bool error::isNull()
 {
-    return content.length()>0;
+    return content.length()==0;
 }
 
 void error::clear()

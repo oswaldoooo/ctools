@@ -13,6 +13,11 @@ namespace ctools
     {
         T object;
         error err;
+        ~Ans(){
+            // if need free,delete the object
+            if(needfree) delete [] object;
+        }
+        bool needfree=false;
     };
     template<class T>
     std::map<T,none> *arrayTomap(const T *src,int langth);

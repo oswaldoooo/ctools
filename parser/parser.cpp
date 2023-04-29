@@ -1,8 +1,12 @@
 #include "parser.h"
-#include "/home/dev/cpp/lib/tools/tools.h"
+#include "error/error.h"
+#include "tools/tools.h"
+#include <cstdio>
 #include <vector>
 #include <string>
 #include <cstring>
+#include <fstream>
+#include <iostream>
 using namespace std;
 using namespace ctools;
 bool parser::matchsymbol(const char *dst, const char *src)
@@ -192,4 +196,85 @@ std::map<std::string, int> ctools::parecontentplusplus(const char *src, const ch
     }
     delete commap;
     return res;
+}
+
+error ctools::writeToFile(const char *filename,const char *content,actmode act){
+    error err;
+    ios::ios_base::openmode md;
+    switch (act) {
+    case ctools::actmode::append:
+        md=ios::app;
+        break;
+    case ctools::actmode::trunc:
+        md=ios::trunc;
+        break;
+    default:
+        err.join("not the action mode");
+        return err;
+    }
+    std::ofstream ofs;
+    ofs.open(filename,md);
+    ofs<<content;
+    ofs.close();
+    return err;
+}
+Ans<char*> ctools::readFrom(const char *filename){
+    Ans<char*> res;
+    ifstream ifs;
+    ifs.open(filename,ios::in);
+    ifs.seekg(0,ifs.end);
+    int filesize=ifs.tellg();
+    ifs.seekg(0,ifs.beg);
+    res.object=new char[filesize+1];
+    res.needfree=true;//tell ans this need free
+    ifs.read(res.object, filesize+1);
+    ifs.close();
+    return res;
+}
+unsigned long ctools::filesize(const char *filename){
+    ifstream ifs;
+    ifs.open(filename,ios::in);
+    ifs.seekg(0,ifs.end);
+    unsigned long size=ifs.tellg();
+    ifs.seekg(0,ifs.beg);
+    ifs.close();
+    return size;
+}
+char *ctools::formatsize(unsigned long origin){
+#ifndef out_template
+#define out_template "%lu %s"
+#endif
+    enum class sizeform{B,KB,MB,GB,TB,PB};
+    int start=0;
+    while (origin>=1024) {
+        origin=origin/1024;
+        start++;
+    }
+    string newres=to_string(origin);
+    char *newcres=new char[newres.size()+3];
+    int res;
+    switch (start) {
+    case (int)sizeform::B:
+        res=snprintf(newcres,newres.length()+3,out_template , origin,"");
+        break;
+    case (int)sizeform::KB:
+        res=snprintf(newcres,newres.length()+3,out_template , origin,"KB");
+        break;
+    case (int)sizeform::MB:
+        res=snprintf(newcres,newres.length()+3,out_template , origin,"MB");
+        break;
+    case (int)sizeform::GB:
+        res=snprintf(newcres,newres.length()+3,out_template , origin,"GB");
+        break;
+    case (int)sizeform::TB:
+        res=snprintf(newcres,newres.length()+3,out_template , origin,"TB");
+        break;
+    case (int)sizeform::PB:
+        res=snprintf(newcres,newres.length()+3,out_template , origin,"PB");
+        break;
+    default:
+        res=snprintf(newcres,newres.length()+3,out_template , origin,"PB");
+        break;
+    }
+    return newcres;
 }

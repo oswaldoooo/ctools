@@ -1,5 +1,7 @@
 #ifndef parser_h
 #define parser_h
+#include "error/error.h"
+#include "tools/tools.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -23,6 +25,12 @@ namespace ctools{
     std::vector<std::string> parsercontentplus(const char *src,const char *delims);
     //pass the delims,return map
     std::map<std::string,int> parecontentplusplus(const char *src,const char *delims);
+    enum class actmode{append,trunc};
+    error writeToFile(const char *filename,const char *content,actmode act=actmode::append);
+    Ans<char*> readFrom(const char *filename);
+    unsigned long filesize(const char *filename);
+    //need handle free the result
+    char *formatsize(unsigned long origin);
 }
 
 #endif

@@ -4,20 +4,32 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "../error/error.h"
+#include "error/error.h"
 namespace ctools
 {
     struct none{};
-    template<class T>
+    template<typename T>
     struct Ans
     {
         T object;
         error err;
         ~Ans(){
             // if need free,delete the object
-            if(needfree) delete [] object;
+            // if(needfree){
+            //     delete[] object;
+            // }
         }
         bool needfree=false;
+    };
+    template <typename T>
+    struct AnsVec{
+        std::vector<T> object;
+        error err;
+    };
+    template <typename T,typename E>
+    struct AnsMap{
+        std::map<T, E> object;
+        error err;
     };
     template<class T>
     std::map<T,none> *arrayTomap(const T *src,int langth);
@@ -62,5 +74,7 @@ namespace ctools
             }
         }
     }
+    //sleep n seconds
+    void sleep(unsigned int n);
 } // namespace ctools
 #endif

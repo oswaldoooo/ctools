@@ -213,7 +213,7 @@ error ctools::writeToFile(const char *filename,const char *content,actmode act){
         return err;
     }
     std::ofstream ofs;
-    ofs.open(filename,md);
+    ofs.open(filename,md|ios::out);
     ofs<<content;
     ofs.close();
     return err;

@@ -1,3 +1,4 @@
+#include <ctime>
 #include <map>
 #include <vector>
 #include <iostream>
@@ -193,6 +194,10 @@ namespace ctools
         }
         delete[] tem;
         return res;
+    }
+    void sleep(unsigned int n){
+        clock_t now=clock();
+        while(clock()-now<n*CLOCKS_PER_SEC);
     }
 
 } // namespace ctools

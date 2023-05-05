@@ -278,3 +278,58 @@ char *ctools::formatsize(unsigned long origin){
     }
     return newcres;
 }
+bool file_exist(char *filename){
+    ifstream ifs(filename);
+    return ifs.good();
+}
+bool insertInto(char *filename, char *content,unsigned int line_num){
+    ifstream ifs;
+    ifs.open(filename,ios::in);
+    if(!ifs.good()) return false;
+    ifs.seekg(0,ifs.end);
+    int length=ifs.tellg();
+    ifs.seekg(0,ifs.beg);
+    char subcontent[length+1];
+    char body[length+1];
+    unsigned int line;
+    while(ifs.getline(subcontent,length+1)){
+        line++;
+        subcontent[strlen(subcontent)]='\n';
+        strncat(body,subcontent,strlen(subcontent));
+        if(line==line_num) strncat(body, content, strlen(content));
+        memset(subcontent, 0, strlen(subcontent));
+    }
+    ifs.close();
+    ofstream ofs;
+    ofs.open(filename,ios::out|ios::trunc);
+    ofs<<body;
+    ofs.close();
+    return true;
+}
+bool replaceInFile(char *filename, char *content, unsigned int line_num){
+    ifstream ifs;
+    ifs.open(filename,ios::in);
+    if(!ifs.good()) return false;
+    ifs.seekg(0,ifs.end);
+    int length=ifs.tellg();
+    ifs.seekg(0,ifs.beg);
+    char subcontent[length+1];
+    char body[length+1];
+    unsigned int line;
+    while(ifs.getline(subcontent,length+1)){
+        line++;
+        if(line==line_num){
+            strncat(body, content, strlen(content));
+        }else{
+            subcontent[strlen(subcontent)]='\n';
+            strncat(body,subcontent,strlen(subcontent));    
+        }
+        memset(subcontent, 0, strlen(subcontent));
+    }
+    ifs.close();
+    ofstream ofs;
+    ofs.open(filename,ios::out|ios::trunc);
+    ofs<<body;
+    ofs.close();
+    return true;
+}

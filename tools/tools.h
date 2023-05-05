@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <memory>
+#include <stdexcept>
 #pragma onece;
 #ifndef tools_h
 #define tools_h
@@ -8,6 +11,7 @@
 namespace ctools
 {
     struct none{};
+    enum class ans_mod{normal,array};
     template<typename T>
     struct Ans
     {
@@ -19,7 +23,53 @@ namespace ctools
             //     delete[] object;
             // }
         }
+        // Ans(Ans&& origin){object=std::move(origin.object);}
         bool needfree=false;
+    };
+    template <typename T>
+    struct Ansunique{
+        std::unique_ptr<T> object;
+        std::unique_ptr<T[]> objectarr;
+        bool isobject;
+        bool isobjectarr;
+        ans_mod md=ans_mod::normal;
+        error err;
+        Ansunique(ans_mod newmod=ans_mod::normal){
+            md=newmod;
+            switch (md) {
+            case ans_mod::normal:
+                object=std::unique_ptr<T>(new T);
+                break;
+            case ans_mod::array:
+                objectarr=std::unique_ptr<T[]>(new T[10]);
+                break;
+            default:
+                throw std::out_of_range("not support mode");
+                break;
+            }
+        }
+        Ansunique(Ansunique&& origin){
+            switch (md) {
+            case ans_mod::normal:
+                object=std::move(origin.object);
+                break;
+            case ans_mod::array:
+                objectarr=std::move(origin.objectarr);
+                break;
+            default:
+                throw std::out_of_range("not support mode");
+                break;
+            }
+        }
+        void setnormal(std::unique_ptr<T>& origin){
+            md=ans_mod::normal;
+            object=std::move(origin);
+        }
+        void setarray(std::unique_ptr<T[]>&origin){
+            md=ans_mod::array;
+            objectarr=std::move(origin);
+        }
+
     };
     template <typename T>
     struct AnsVec{

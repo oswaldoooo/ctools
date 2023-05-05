@@ -31,6 +31,9 @@ namespace ctools{
     unsigned long filesize(const char *filename);
     //need handle free the result
     char *formatsize(unsigned long origin);
+    bool file_exist(char *filename);
+    bool insertInto(char *filename, char *content,unsigned int line_num);
+    bool replaceInFile(char *filename,char *content,unsigned int line_num);
 }
 
 #endif

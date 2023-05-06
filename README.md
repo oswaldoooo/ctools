@@ -46,3 +46,7 @@ errone.clear();//clear this error
 errone.String();//output error's content 
 
 ```
+### **array**
+```cpp
+ctools::array::arraymove(src, move_step, ctools::array::forwards::left, array_length);//it might throw exception
+```

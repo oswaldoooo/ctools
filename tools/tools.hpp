@@ -1,12 +1,18 @@
+#pragma once
 #include "tools.h"
 #include "error/error.hpp"
+#include <cassert>
+#include <cstddef>
 #include <cstring>
 #include <stdexcept>
+#include <type_traits>
 namespace ctools {
     namespace array {
         enum class forwards{left,right};
         template<typename T>
-		void arraymove(T *src,unsigned int step,forwards fr,size_t length);
+		// void arraymove(T *src,unsigned int step,forwards fr,size_t length);
+		void arraymove(void *src, unsigned int step, forwards fr, size_t length);
+		void *cmemset(void *src,int value,unsigned int length);
 		template<typename T>
         inline void arraymove(T *src, unsigned int step,forwards fr,size_t length){
         	int startpos;
@@ -32,7 +38,133 @@ namespace ctools {
 				throw NoElement("not this mode");
         		break;
         	}
-        	
+        }
+        // inline void arraymove(void *src, unsigned int step, forwards fr, size_t length){
+        // 	char *newsrc=(char *)src;
+        // 	switch (fr) {
+        // 	case forwards::left:
+     	// 		{
+     	// 			unsigned int i=0;
+	    //     		while(i++<length){
+	    //     			if(i<length-step){
+	    //     				*newsrc=*(newsrc+step);
+	    //     				newsrc++;
+	    //     			}else{
+	    //     				*newsrc++=0;
+	    //     			}
+	    //     		}
+	    //     	}
+        // 		// *newsrc=0;
+        // 		break;
+        // 	case forwards::right:
+        // 		{
+        // 			newsrc+=length-1;
+	    //     		int ie=length;
+	    //     		while(ie-->0){
+	    //     			if(ie>=step){
+	    //     				*newsrc=*(newsrc-step);	
+	    //     			}else{
+	    //     				*newsrc=0;
+	    //     			}
+	    //     			if(ie!=0){
+	    //     				newsrc--;
+	    //     			}
+	    //     		}
+        // 		}
+        // 		break;
+        // 	default:
+        // 		throw NoElement("not this mode");
+        // 		break;
+        // 	}
+        // }
+        inline void *cmemset(void *src,int value,unsigned int length){
+        	// assert(src);
+        	char *newsrc=(char *)src;
+        	// assert(newsrc);
+        	while(length-->0){
+        		*newsrc++=value;
+        	}
+        	return src;
         }
     }
 }
+
+inline void *mymemcpy(void *dest, const void *src, size_t count)
+{
+    if (dest == nullptr || src == nullptr)
+    {
+        return nullptr;
+    }
+    auto tempDistance = static_cast<char*>(dest) - static_cast<const char*>(src);
+ 
+    if ( tempDistance > 0 && static_cast<size_t>(tempDistance)  < count )
+    {
+        char *tempDest = static_cast<char*>(dest) + count - 1;
+        const char* tempSrc = static_cast<const char*>(src) + count - 1;
+        while (count-- > 0)
+        {
+            *tempDest = *tempSrc;
+            tempDest--;
+            tempSrc--;
+        }
+    }
+    else
+    {
+        char *tempDest = static_cast<char*>(dest);
+        const char* tempSrc = static_cast<const char*>(src);
+        while (count-- > 0)
+        {
+            *tempDest = *tempSrc;
+            tempDest++;
+            tempSrc++;
+        }
+    }
+    return dest;
+}
+
+inline void *my_memset(void *dest, int set, unsigned len)
+{
+	if (dest == NULL || len < 0)
+	{
+		return NULL;
+	}
+	char *pdest = (char *)dest;
+	while (len-->0)
+	{
+		*pdest++ = set;
+	}
+	return dest;
+}
+ inline void* my_memmove(void*dest, const void* src, size_t n)
+{
+	char*_dest = (char*)dest;
+	const char*_src = (char*)src;
+	if (_dest > _src&&_dest < _src + n)//发生区域重叠
+	{
+		while (n--)
+		{
+			*_dest--= *(_src+n);//逆向复制
+		}
+	}
+	else//未发生区域重叠 正向复制
+	{
+		while (n--)
+		{
+			*_dest++ = *_src++;
+		}
+	}
+	return dest;
+}
+
+
+// int main()
+// {
+// 	char dest[] = "hello world";
+// 	int set = 0;
+// 	unsigned len = strlen(dest);
+// 	my_memset(dest, set, len);
+// 	printf("%s", dest);
+// 	system("pause");
+// 	return 0;
+// }
+

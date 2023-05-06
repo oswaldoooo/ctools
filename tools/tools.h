@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <memory>
 #include <stdexcept>
@@ -17,6 +18,8 @@ namespace ctools
     {
         T object;
         error err;
+        Ans();
+        Ans(T &val):object(val){}
         ~Ans(){
             // if need free,delete the object
             // if(needfree){

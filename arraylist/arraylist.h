@@ -38,7 +38,7 @@ namespace ctools
         ArrayList* getArray(int begin,int end);
         std::output_iterator_tag begin();
         std::output_iterator_tag end();
-
+        void swap(ArrayList &other);
         ArrayList &operator=(const ArrayList &input);
         bool operator==(const ArrayList &two);
         ArrayList<T> &operator=(const T* input);
@@ -298,7 +298,20 @@ namespace ctools
         {
             return arr[i];
         }
-        throw "index out of range";
+        throw std::out_of_range("index out of range");
+    }
+    template <class T>
+    void ArrayList<T>::swap(ArrayList &origin){
+        T *midarr=arr;
+        int midsize=size;
+        int midtop=top;
+        arr=origin.arr;
+        size=origin.size;
+        top=origin.top;
+        origin.arr=midarr;
+        origin.size=midsize;
+        origin.top=midtop;
+
     }
 } // namespace ctools
 #endif

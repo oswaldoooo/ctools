@@ -1,10 +1,10 @@
 #pragma once
+#include <cstring>
+#ifndef tools_h
+#define tools_h
 #include <algorithm>
 #include <memory>
 #include <stdexcept>
-#pragma onece;
-#ifndef tools_h
-#define tools_h
 #include <map>
 #include <vector>
 #include <string>
@@ -20,6 +20,9 @@ namespace ctools
         error err;
         Ans();
         Ans(T &val):object(val){}
+        // Ans &operator=(const Ans&origin){
+        //     return *this;
+        // }
         ~Ans(){
             // if need free,delete the object
             // if(needfree){

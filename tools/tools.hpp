@@ -10,7 +10,6 @@ namespace ctools {
     namespace array {
         enum class forwards{left,right};
         template<typename T>
-		// void arraymove(T *src,unsigned int step,forwards fr,size_t length);
 		void arraymove(void *src, unsigned int step, forwards fr, size_t length);
 		void *cmemset(void *src,int value,unsigned int length);
 		template<typename T>
@@ -24,7 +23,7 @@ namespace ctools {
 				for(int i=startpos;i<endpos;i++){
 					src[i]=src[i+step];//left move
 				}
-				memset(src+step, 0, sizeof(T)*step);
+				memset(src+length-step, 0, sizeof(T)*step);
         		break;
         	case forwards::right:
 				startpos=length-1;
@@ -39,44 +38,6 @@ namespace ctools {
         		break;
         	}
         }
-        // inline void arraymove(void *src, unsigned int step, forwards fr, size_t length){
-        // 	char *newsrc=(char *)src;
-        // 	switch (fr) {
-        // 	case forwards::left:
-     	// 		{
-     	// 			unsigned int i=0;
-	    //     		while(i++<length){
-	    //     			if(i<length-step){
-	    //     				*newsrc=*(newsrc+step);
-	    //     				newsrc++;
-	    //     			}else{
-	    //     				*newsrc++=0;
-	    //     			}
-	    //     		}
-	    //     	}
-        // 		// *newsrc=0;
-        // 		break;
-        // 	case forwards::right:
-        // 		{
-        // 			newsrc+=length-1;
-	    //     		int ie=length;
-	    //     		while(ie-->0){
-	    //     			if(ie>=step){
-	    //     				*newsrc=*(newsrc-step);	
-	    //     			}else{
-	    //     				*newsrc=0;
-	    //     			}
-	    //     			if(ie!=0){
-	    //     				newsrc--;
-	    //     			}
-	    //     		}
-        // 		}
-        // 		break;
-        // 	default:
-        // 		throw NoElement("not this mode");
-        // 		break;
-        // 	}
-        // }
         inline void *cmemset(void *src,int value,unsigned int length){
         	// assert(src);
         	char *newsrc=(char *)src;
@@ -155,16 +116,4 @@ inline void *my_memset(void *dest, int set, unsigned len)
 	}
 	return dest;
 }
-
-
-// int main()
-// {
-// 	char dest[] = "hello world";
-// 	int set = 0;
-// 	unsigned len = strlen(dest);
-// 	my_memset(dest, set, len);
-// 	printf("%s", dest);
-// 	system("pause");
-// 	return 0;
-// }
 

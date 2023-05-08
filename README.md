@@ -21,6 +21,36 @@ arr.deleteEle(index);//delete the index element
 int* newarr=new int[10];
 arr.setAllInfo(newarr,10,0);//custom the array by yourself
 ```
+### **CinPlus**
+```cpp
+#include "tools/cinplus.h"
+#include "tools/cinsecure.h"
+char buff[100];
+//Ultra will hide your input,it equal to plus + secure
+if(getLineUltra(buff,20)){//the input will store in buff,and the wait you time most is 20 seconds,or it will return false,time out
+    printf("%s\n",);
+}else{
+    printf("time out\n");
+}
+
+//plus will not hide your input,but it still wait you with the limit time
+cinplus<int> newcin;//it's use default waittime 10 seconds
+if(newcin.get()){
+    printf("%d\n",newcin.load());    
+}else{
+    printf("time out\n");
+}
+
+if(newcin.getline()){
+    newcin.getstr();
+}else{
+    printf("time out\n");
+}
+
+//cinsecure,just hidden input,not input limit time
+getInput(buff);
+printf("%s\n",buff);
+```
 ### **Parser**
 ```cpp
 char start[]="/*";

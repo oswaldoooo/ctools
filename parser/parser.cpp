@@ -334,25 +334,25 @@ bool replaceInFile(char *filename, char *content, unsigned int line_num){
     ofs.close();
     return true;
 }
-std::map<char*, char*> ctools::parselist(const char *filepath){
+std::map<std::string, std::string> ctools::parselist(const char *filepath){
     struct stat fst;char *mid;
-    std::map<char*, char*> ans;size_t dis;
-    char *ti;char *titwo;
+    std::map<string, string> ans;size_t dis;
+    char *ti;
     if(stat(filepath, &fst)!=-1){
         char content[fst.st_size];
         char left[fst.st_size];
         char right[fst.st_size];
         ifstream ifs;
         ifs.open(filepath,ios::in);
+        ti=new char[fst.st_size];
         while (ifs.getline(content,fst.st_size)) {
             mid=strstr(content,PARSE_MID);
             dis=strlen(content)-strlen(mid);
-            ti=new char[dis+1];
-            titwo=new char[strlen(mid)+1-strlen(PARSE_MID)];
-            strncpy(titwo, mid+strlen(PARSE_MID), strlen(mid)-strlen(PARSE_MID));
             strncpy(ti, content, dis);
-            if(ans.count(ti)==0) ans.insert({ti,titwo});
+            if(ans.count(ti)==0) ans.insert({ti,mid+strlen(PARSE_MID)});
+            memset(ti,0,strlen(ti));
         }
+        delete [] ti;
 
     }else printf("get %s status information failed\n", filepath);
     return ans;

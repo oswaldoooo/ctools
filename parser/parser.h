@@ -37,7 +37,7 @@ namespace ctools{
     bool file_exist(char *filename);
     bool insertInto(char *filename, char *content,unsigned int line_num);
     bool replaceInFile(char *filename,char *content,unsigned int line_num);
-    std::map<char*,char*> parselist(const char *filepath);
+    std::map<std::string,std::string> parselist(const char *filepath);
     void freelist(std::map<char*, char*> map);
 }
 

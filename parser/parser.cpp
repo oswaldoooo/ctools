@@ -2,6 +2,7 @@
 #include "error/error.h"
 #include "tools/tools.h"
 #include <cstdio>
+#include <sys/stat.h>
 #include <vector>
 #include <string>
 #include <cstring>
@@ -218,19 +219,19 @@ error ctools::writeToFile(const char *filename,const char *content,actmode act){
     ofs.close();
     return err;
 }
-Ans<char*> ctools::readFrom(const char *filename){
-    Ans<char*> res;
-    ifstream ifs;
-    ifs.open(filename,ios::in);
-    ifs.seekg(0,ifs.end);
-    int filesize=ifs.tellg();
-    ifs.seekg(0,ifs.beg);
-    res.object=new char[filesize+1];
-    res.needfree=true;//tell ans this need free
-    ifs.read(res.object, filesize+1);
-    ifs.close();
-    return res;
-}
+// Ans<char*> ctools::readFrom(const char *filename){
+//     Ans<char*> res;
+//     ifstream ifs;
+//     ifs.open(filename,ios::in);
+//     ifs.seekg(0,ifs.end);
+//     int filesize=ifs.tellg();
+//     ifs.seekg(0,ifs.beg);
+//     res.object=new char[filesize+1];
+//     res.needfree=true;//tell ans this need free
+//     ifs.read(res.object, filesize+1);
+//     ifs.close();
+//     return res;
+// }
 unsigned long ctools::filesize(const char *filename){
     ifstream ifs;
     ifs.open(filename,ios::in);
@@ -332,4 +333,33 @@ bool replaceInFile(char *filename, char *content, unsigned int line_num){
     ofs<<body;
     ofs.close();
     return true;
+}
+std::map<char*, char*> ctools::parselist(const char *filepath){
+    struct stat fst;char *mid;
+    std::map<char*, char*> ans;size_t dis;
+    char *ti;char *titwo;
+    if(stat(filepath, &fst)!=-1){
+        char content[fst.st_size];
+        char left[fst.st_size];
+        char right[fst.st_size];
+        ifstream ifs;
+        ifs.open(filepath,ios::in);
+        while (ifs.getline(content,fst.st_size)) {
+            mid=strstr(content,PARSE_MID);
+            dis=strlen(content)-strlen(mid);
+            ti=new char[dis+1];
+            titwo=new char[strlen(mid)+1-strlen(PARSE_MID)];
+            strncpy(titwo, mid+strlen(PARSE_MID), strlen(mid)-strlen(PARSE_MID));
+            strncpy(ti, content, dis);
+            if(ans.count(ti)==0) ans.insert({ti,titwo});
+        }
+
+    }else printf("get %s status information failed\n", filepath);
+    return ans;
+}
+void ctools::freelist(std::map<char *, char *> map){
+    if(map.size()==0) return;
+    for(auto [key,value]:map){
+        delete[] key;delete[] value;
+    }
 }

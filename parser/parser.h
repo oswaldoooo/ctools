@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#ifndef PARSE_MID
+#define PARSE_MID "=" 
+#endif
 namespace ctools{
     class parser{
     private:
@@ -27,13 +30,15 @@ namespace ctools{
     std::map<std::string,int> parecontentplusplus(const char *src,const char *delims);
     enum class actmode{append,trunc};
     error writeToFile(const char *filename,const char *content,actmode act=actmode::append);
-    Ans<char*> readFrom(const char *filename);
+    // Ans<char*> readFrom(const char *filename);
     unsigned long filesize(const char *filename);
     //need handle free the result
     char *formatsize(unsigned long origin);
     bool file_exist(char *filename);
     bool insertInto(char *filename, char *content,unsigned int line_num);
     bool replaceInFile(char *filename,char *content,unsigned int line_num);
+    std::map<char*,char*> parselist(const char *filepath);
+    void freelist(std::map<char*, char*> map);
 }
 
 #endif

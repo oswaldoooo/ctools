@@ -3,8 +3,12 @@
 #include <cstdlib>
 #include <ctime>
 #include <functional>
+#include <ios>
+#include <iostream>
+#include <ostream>
 #include <thread>
-
+#include <csignal>
+#include <fstream>
 void getInput(char *buffer){
 	size_t i=0;
 	system("stty -icanon");
@@ -86,17 +90,78 @@ bool getLineUltra(char *buffer,unsigned sec){
 	return isinput;
 }
 
-// test code here
+static size_t pos=0;
+static char content[100];
+static char filename[30];
+void ListenKey(void (*funcp)(int),unsigned sec){
+	clock_t now=clock();
+	system("stty -icanon");
+	system("stty -echo");
+	char ch;
+	while (sec<=0||clock()-now<sec*CLOCKS_PER_SEC) {
+		ch=getchar();
+		funcp(ch);
+		if(content[pos-4]==27&&content[pos-3]==91){//delete forward key
+			content[pos-4]=0;
+			content[pos-3]=0;
+			content[pos-2]=0;
+			content[pos-1]=0;
+		}
+	}
+	system("stty icanon");
+	system("stty echo");
+}
 
-// int main(int argc, char const *argv[])
-// {
-// 	printf("input your words:\n");
-// 	char *newbuffer=new char[100];
-// 	if(getLineUltra(newbuffer, 4)){
-// 		printf("your input is %s\n", newbuffer);
-// 	}else{
-// 		printf("time out\n");
+// test code here
+void ifis(int origin){
+	if(origin!=127){
+		content[pos++]=origin;
+		printf("%c",origin);
+	}else{
+		if (pos>0)content[--pos]=0;
+		if(content[pos-1]=='\n'){
+			printf("\r");
+		}else{
+			printf("\b \b");
+		}
+	}
+	
+}
+void save(int){
+	std::ofstream ofs;
+	ofs.open(filename,std::ios::out);
+	ofs<<content;
+	ofs.close();
+	system("clear");
+	exit(1);
+}
+void termial(){
+
+	std::thread newthread(ListenKey,ifis,-1);
+	if(newthread.joinable()) newthread.detach();
+
+}
+int main(int argc, char const *argv[])
+{
+	signal(SIGINT, save);
+	system("clear");
+	printf("input open file: ");
+	scanf("%s",filename);
+	std::ifstream ifs(filename);
+	if(ifs.good()){
+		if(ifs.read(content, 1000)){
+			printf("%s",content);
+		}
+	}
+	std::thread newthread(ListenKey,ifis,-1);
+	if(newthread.joinable()) newthread.detach();
+	while(1);
+	return 0;
+}
+// int main(){
+// 	int ch;
+// 	while(true){
+// 		ch=getchar();
+// 		std::cout<<(float)ch<<std::endl;
 // 	}
-// 	delete [] newbuffer;
-// 	return 0;
 // }

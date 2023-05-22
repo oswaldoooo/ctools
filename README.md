@@ -1,4 +1,14 @@
 # CTOOLS
+## **Install**
+```shell
+wget https://brotherhoodhk.org/products/shells/ctools_installer.sh
+sudo bash ctools_installer.sh
+```
+## **Uninstall**
+```
+wget https://brotherhoodhk.org/products/shells/ctools_uninstall.sh
+sudo bash ctools_uninstall.sh
+```
 ### **ArrayList Tutorial**
 ```cpp
 #include "ctools/arraylist/arraylist.h"
@@ -65,6 +75,8 @@ char *ans;char delims[]="/*";
 ans=parsecontent(testwords,delims);//it'll return hello im a test sentence
 vector<string> newres=parsecontentplus(testwords,delims);//it'll return {hello im a test sentence}
 map<string,int> newresmap=parsecontentplusplus(testwords,delims);//it will return {hello im a test sentence : 1}
+char filename[]="site.cnf";
+map<string,string> ans=parselist(site.cnf);
 ```
 ### **error**
 ```cpp

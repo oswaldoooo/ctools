@@ -19,6 +19,7 @@ namespace ctools
         T object;
         error err;
         Ans();
+        Ans(T val):object(val){}
         Ans(T &val):object(val){}
         // Ans &operator=(const Ans&origin){
         //     return *this;

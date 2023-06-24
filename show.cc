@@ -11,8 +11,8 @@ template<>
 std::string ctools::marshal(struct Name *name){
 	Json::Value jv;
 	Json::FastWriter writer;
-	jv["first_name"]=name->first_name;
-	jv["last_name"]=name->last_name;
+	jv["firstname"]=name->first_name;
+	jv["lastname"]=name->last_name;
 	return writer.write(jv);
 }
 void cstr_tostr(char*,const char*);

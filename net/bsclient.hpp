@@ -27,10 +27,23 @@ namespace ctools{
 			string type;
 			string path;
 			string content;
+			request()=delete;
+			request(const char *typed):type(typed){
+			}
 		};
 	}
 }
 
+//add the request's marshal
+template <>
+string ctools::marshal(struct ctools::net::request* req){
+	Json::Value jv;
+	Json::FastWriter writer;
+	jv["type"]=req->type;
+	jv["path"]=req->path;
+	jv["content"]=req->content;
+	return writer.write(jv);
+}
 
 namespace ctools {
 	class Bsclient:public Client{
@@ -102,6 +115,7 @@ support tcp,udp,unix socket(will be update not far)
 		string path;
 		size_t buffer_size=1<<10;
 		net::socktype st;
+		struct net::request req="json";
 	public:
 		bool close=false;
 		bool needwait=true;
@@ -125,7 +139,7 @@ support tcp,udp,unix socket(will be update not far)
 				uend=ip::udp::endpoint(ip::address::from_string(match[2].str()),port);
 				usock=new ip::udp::socket(io);
 			}else throw std::logic_error("not support type");
-			path=match[4].str();
+			req.path=match[4].str();
 			msgpipe=new int[2];
 			anspipe=new int[2];
 			if(pipe(msgpipe)==-1) throw std::logic_error("create msgpipe failed");
@@ -147,7 +161,7 @@ support tcp,udp,unix socket(will be update not far)
 				uend=ip::udp::endpoint(ip::address::from_string(match[2].str()),port);
 				usock=new ip::udp::socket(io);
 			}else throw std::logic_error("not support type");
-			path=match[4].str();
+			req.path=match[4].str();
 			this->msgpipe=msgpipe;
 			this->anspipe=anspipe;
 
@@ -182,8 +196,12 @@ support tcp,udp,unix socket(will be update not far)
 
 		}
 		void write_some(std::string *data, boost::system::error_code *ec) override{
+			// second encode here
+			req.content=*data;
+			string ms=marshal(&req);
+			printf("write to server:[%s]\n", ms.c_str());
 			if(st==net::socktype::TCP){
-				this->tsock->write_some(boost::asio::buffer(*data),*ec);
+				this->tsock->write_some(boost::asio::buffer(ms),*ec);
 			}else if(st==net::socktype::UDP){
 				this->usock->send(boost::asio::buffer(*data));
 			}

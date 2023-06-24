@@ -1,3 +1,4 @@
+
 # CTOOLS
 ## **Install**
 ```shell
@@ -9,6 +10,64 @@ sudo bash ctools_installer.sh
 wget https://brotherhoodhk.org/products/shells/ctools_uninstall.sh
 sudo bash ctools_uninstall.sh
 ```
+## **New Features**
+#### **Cmirco NetKits** 24 june 2023
+example here
+```cpp
+int main(){
+    int msgpipe[2];int anspipe[2];int ok;
+    ok=pipe(msgpipe);
+    if(ok==-1)throw std::logic_error("create msg pipe failed");
+    ok=pipe(anspipe);
+    if(ok==-1)throw std::logic_error("create ans pipe failed");
+    switch (fork()) {//open a new process for dial to server
+    case 0:
+        //goto child process
+        {
+            printf("current pid %d\n", getpid());
+            ctools::Bstclient bcl("bst://127.0.0.1:8000/v1/greet",msgpipe,anspipe);
+            // ctools::Bsclient bcl(localhost)
+            bcl.connect();
+            dial(&bcl, msgpipe[0], anspipe[1]);
+            exit(-1);
+        }
+    case -1:
+        //failed
+        printf("create child fork failed\n");
+        break;
+    }
+    char inbuffer[1<<10];
+    char outbuffer[1<<10];
+    struct Name name;struct Ans ans;
+    char first_name[20];char last_name[20];
+    name.first_name=first_name;name.last_name=last_name;
+    std::string res;int wok;int rok;
+    printf("prepare binding keys,now pid is %d\n",getpid());
+    while(true){
+        if(strlen(outbuffer)>0)memset(outbuffer, 0, sizeof(char)*strlen(outbuffer));
+        std::cout<<"name: ";
+        std::cin>>name.first_name>>name.last_name;
+        res=ctools::marshal(&name);//encode
+        wok=write(msgpipe[1], res.c_str(),1<<10);//send to server
+        if (wok!=-1){
+            printf("wait from back\n");
+            rok=read(anspipe[0], outbuffer, 1<<10);
+            printf("get from back\n");
+            if (rok!=-1){
+                ctools::unmarshal(&ans, outbuffer);//decode
+                printf("from server:%s\n", outbuffer);
+            }else{
+                printf("read from ans pipe failed\n");
+            }
+        }else{
+            printf("write to msg pipe failed\n");
+        }
+    }
+    //continue
+    return 0;
+}
+```
+
 ### **ArrayList Tutorial**
 ```cpp
 #include "ctools/arraylist/arraylist.h"

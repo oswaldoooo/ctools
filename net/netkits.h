@@ -8,7 +8,7 @@ namespace ctools{
 		virtual bool isclose()=0;
 		virtual bool needwaitreturn()=0;
 		virtual void getback()=0;
-		virtual void write_some(std::string&,boost::system::error_code&)=0;
-		virtual std::string read_some(boost::system::error_code&)=0;
+		virtual void write_some(std::string*,boost::system::error_code*)=0;
+		virtual void read_some(char *outbuffer,boost::system::error_code*)=0;
 	};
 }

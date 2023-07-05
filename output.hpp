@@ -1,11 +1,13 @@
 #pragma once
 #include <bits/types/FILE.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include <fcntl.h>
+#include <stdexcept>
 #include <string>
-#include <unistd.h>
 #include <vector>
 #define default_out_file "out.log"
 int stdfd = STDOUT_FILENO;
@@ -23,6 +25,7 @@ struct prefix {
             ans += "[" + prefixname + "] ";
         }
         if (time) {
+            // todo: time need format to string for add to prefix output
             time_t ti = std::time(nullptr);
             ans += std::to_string(ti) + " ";
         }
@@ -61,3 +64,39 @@ void outputwithprefix(struct prefix* pf, const char* data)
     FILE* fil = fdopen(stdfd, "w");
     fprintf(fil, finalans.c_str());
 }
+
+//new outputer,use outputer output to file or terminal.
+class Outputer {
+private:
+    struct prefix* prf;
+    int fid;
+
+public:
+    Outputer() { fid = STDOUT_FILENO; }
+    Outputer(int tfid) { fid = tfid; }
+    Outputer(const char* filepath)
+    {
+        fid = open(filepath, O_WRONLY | O_CREAT|O_APPEND, 0600);
+        if (fid < 0) {
+            throw std::logic_error("open output file failed");
+        }
+    }
+    void output(const char* words)
+    {
+        int ok = write(fid, words, sizeof(char) * strlen(words));
+        if (ok < 0) {
+            throw std::logic_error("write to target file failed");
+        }
+    }
+    void outputwithprefix(struct prefix* pf, const char* words) {
+        std::string newans=pf->string();
+        newans+=words;
+        if (words[strlen(words)-1]!='\n'){
+            newans+='\n';
+        }
+        int ok=write(fid, newans.c_str(), sizeof(char)*newans.length());
+        if (ok<0){
+            throw std::logic_error("write to target file failed");
+        }
+    }
+};

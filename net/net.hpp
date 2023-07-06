@@ -19,8 +19,6 @@ private:
     int* core_pipe;
     size_t buffer_size = 1 << 10;
     char* out_buffer;
-    friend pipe& operator>>(pipe&, std::string&);
-    friend pipe& operator<<(pipe&, std::string);
 
 public:
     pipe()
@@ -82,6 +80,13 @@ pipe& operator>>(pipe& origin, std::string& target)
 pipe& operator<<(pipe& origin, std::string data)
 {
     // printf("start write to pipe\n");
+    origin.write(data);
+    return origin;
+}
+
+template <size_t N>
+pipe& operator<<(pipe& origin, const char data[N])
+{
     origin.write(data);
     return origin;
 }

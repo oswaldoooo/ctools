@@ -4,7 +4,7 @@
 #include <boost/asio/basic_datagram_socket.hpp>
 #include <cstdio>
 #include <cstring>
-#include <error/error.hpp>
+#include <ctools/error/error.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -19,6 +19,8 @@ private:
     int* core_pipe;
     size_t buffer_size = 1 << 10;
     char* out_buffer;
+    friend pipe& operator>>(pipe&, std::string&);
+    friend pipe& operator<<(pipe&, std::string);
 
 public:
     pipe()
@@ -70,6 +72,19 @@ public:
         delete[] out_buffer;
     }
 };
+
+pipe& operator>>(pipe& origin, std::string& target)
+{
+    // printf("start read from pipe\n");
+    target = origin.read_tostr();
+    return origin;
+}
+pipe& operator<<(pipe& origin, std::string data)
+{
+    // printf("start write to pipe\n");
+    origin.write(data);
+    return origin;
+}
 
 // the parent class all conn
 class conn {

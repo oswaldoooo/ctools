@@ -11,6 +11,26 @@ wget https://brotherhoodhk.org/products/shells/ctools_uninstall.sh
 sudo bash ctools_uninstall.sh
 ```
 ## **New Features**
+#### **Net-Kits and New FIFO** 6 july 2023
+add the fifo class and netkits header.them all are header-only.
+examples here
+```cpp
+#include "ctools/net/fifo.hpp"
+#include <string>
+int main(){
+    ctools::FIFO fiforead("fifo",ctools::mod::read);
+    ctools::FIFO fifowrite("fifo",ctools::mod::write);
+    fifowrite.write("hello world");
+    std::string ans=fiforead().read();
+    printf("the accept from fifo %s\n",ans.c_str());
+    //you can also do like this
+    fifowrite<<"hello world";
+    char buffer[1<<10];
+    fiforead>>buffer;
+    printf("the accept from fifo %s\n",buffer);
+    return 0;
+}
+```
 #### **Cmirco NetKits** 24 june 2023
 example here
 ```cpp

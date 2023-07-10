@@ -28,9 +28,9 @@ void dofile(const char* parendir, const char* filename)
         return;
     }
     if (S_ISDIR(st.st_mode)) {
-        DIR* dirinfo = opendir(filename);
+        DIR* dirinfo = opendir(fullpath.c_str());
         if (dirinfo == NULL) {
-            printf("open dir %s failed\n", filename);
+            printf("open dir %s failed\n", fullpath.c_str());
             return;
         }
         struct dirent* finfo;

@@ -1,5 +1,7 @@
-all:buildtools buildmarsha
+all:lib buildtools buildmarsha
 	echo installall
+lib:
+	mkdir lib
 .PHONY:buildtools
 buildtools:
 	g++ -o lib/libtools.so -std=c++17 tools/tools.cpp tools/cinsecure.cpp error/error.cpp -I.. -I.
@@ -12,6 +14,8 @@ buildtest:
 .PHONY:bsclient
 bsclient:
 	g++ -o bsclient app.cc show.cc -ljsoncpp -I. -I.. -std=c++17
+ifile:
+	g++ -o ifile ifile.cc -std=c++17 -lgflags
 .PHONY:clean
 clean:
 	rm lib/*

@@ -22,6 +22,7 @@ class error {
 public:
     virtual bool isempty() = 0;
     virtual std::string what() = 0;
+    virtual void clear() = 0;
 };
 class logic_error : public error {
 private:
@@ -44,6 +45,10 @@ public:
     std::string what() override
     {
         return core;
+    }
+    void clear() override
+    {
+        core.clear();
     }
 };
 logic_error& operator<<(logic_error& origin, const char* data)

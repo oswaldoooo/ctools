@@ -16,6 +16,11 @@ bsclient:
 	g++ -o bsclient app.cc show.cc -ljsoncpp -I. -I.. -std=c++17
 ifile:
 	g++ -o ifile ifile.cc -std=c++17 -lgflags
+precheck:ifile
+	cp cmd.txt .. && touch precheck && cd .. && ctools/ifile ctools
+.PHONY:install
+install:precheck lib buildtools buildmarsha
+	bash install.sh
 .PHONY:clean
 clean:
 	rm lib/*

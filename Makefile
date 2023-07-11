@@ -18,6 +18,8 @@ ifile:
 	g++ -o ifile ifile.cc -std=c++17 -lgflags
 precheck:ifile
 	cp cmd.txt .. && touch precheck && cd .. && ctools/ifile ctools
+installlib:
+	apt install libjsoncpp-dev -y && apt install libgflags-dev -y && apt install libyaml-cpp-dev -y && touch installlib
 .PHONY:install
 install:precheck lib buildtools buildmarsha
 	bash install.sh

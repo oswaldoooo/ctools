@@ -1,5 +1,6 @@
 #pragma once
 #include <fcntl.h>
+#include <memory>
 #include <unistd.h>
 
 #include <cstdio>
@@ -26,7 +27,9 @@ struct prefix {
         if (time) {
             // todo: time need format to string for add to prefix output
             time_t ti = std::time(nullptr);
-            ans += std::to_string(ti) + " ";
+            const char* cti = ctime(&ti);
+            ans += cti;
+            ans += " ";
         }
         if (!tags.empty()) {
             std::string newans = "(";
@@ -44,18 +47,18 @@ void set_release(const char* target = default_out_file);
 void output(const char* data);
 void outputwithprefix(struct prefix*, const char* data);
 
-void set_release(const char* target)
+inline void set_release(const char* target)
 {
     int fid = open(target, O_WRONLY);
     stdfd = fid;
 }
-void output(const char* data)
+inline void output(const char* data)
 {
     // FILE* fil = fdopen(stdfd, "w");
     // fprintf(fil, data);
     write(stdfd, data, sizeof(char) * strlen(data));
 }
-void outputwithprefix(struct prefix* pf, const char* data)
+inline void outputwithprefix(struct prefix* pf, const char* data)
 {
     std::string finalans;
     finalans = pf->string();
@@ -71,6 +74,7 @@ class Outputer {
 private:
     struct prefix* prf;
     int fid;
+    std::string outpath;
 
 public:
     Outputer() { fid = STDOUT_FILENO; }
@@ -81,6 +85,7 @@ public:
         if (fid < 0) {
             throw std::logic_error("open output file failed");
         }
+        outpath = filepath;
     }
     void output(const char* words)
     {
@@ -100,5 +105,18 @@ public:
         if (ok < 0) {
             throw std::logic_error("write to target file failed");
         }
+    }
+    std::unique_ptr<char[]> getmod()
+    {
+        std::unique_ptr<char[]> ans = std::unique_ptr<char[]>(new char[100]);
+        memset(ans.get(), 0, sizeof(char) * 100);
+        std::string ansstr;
+        if (fid == STDOUT_FILENO) {
+            ansstr = "stdout";
+        } else {
+            ansstr = outpath.empty() ? "unknown path" : outpath;
+        }
+        strncpy(ans.get(), ansstr.c_str(), sizeof(char) * ansstr.length());
+        return ans;
     }
 };

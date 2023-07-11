@@ -34,9 +34,9 @@ public:
     {
         core += data;
     }
-    void join(error err)
+    void join(logic_error err)
     {
-        core += "\n" + err.what();
+        core += err.core;
     }
     bool isempty() override
     {

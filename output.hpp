@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #define default_out_file "out.log"
-int stdfd = STDOUT_FILENO;
+inline int stdfd = STDOUT_FILENO;
 #define default_template "[%s] %s %s"
 #define default_template_two "[%s] %s"
 #define default_template_three "[%s]"
@@ -18,7 +18,7 @@ struct prefix {
     std::string prefixname;
     bool time;
     std::vector<std::string> tags;
-    std::string string()
+    std::string string() const
     {
         std::string ans;
         if (!prefixname.empty()) {
@@ -33,7 +33,7 @@ struct prefix {
         }
         if (!tags.empty()) {
             std::string newans = "(";
-            for (std::string& value : tags) {
+            for (const std::string& value : tags) {
                 newans += value + " ";
             }
             newans += ")";
@@ -54,8 +54,6 @@ inline void set_release(const char* target)
 }
 inline void output(const char* data)
 {
-    // FILE* fil = fdopen(stdfd, "w");
-    // fprintf(fil, data);
     write(stdfd, data, sizeof(char) * strlen(data));
 }
 inline void outputwithprefix(struct prefix* pf, const char* data)
@@ -64,8 +62,6 @@ inline void outputwithprefix(struct prefix* pf, const char* data)
     finalans = pf->string();
     finalans += data;
     printf("prepare input data %s\n", pf->string().c_str());
-    // FILE* fil = fdopen(stdfd, "w");
-    // fprintf(fil, finalans.c_str());
     write(stdfd, finalans.c_str(), sizeof(char) * finalans.length());
 }
 
@@ -94,7 +90,7 @@ public:
             throw std::logic_error("write to target file failed");
         }
     }
-    void outputwithprefix(struct prefix* pf, const char* words)
+    void outputwithprefix(const struct prefix* pf, const char* words)
     {
         std::string newans = pf->string();
         newans += words;

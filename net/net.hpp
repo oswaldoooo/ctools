@@ -1,14 +1,18 @@
 #pragma once
-#include "boost/asio/ip/tcp.hpp"
-#include <boost/asio.hpp>
-#include <boost/asio/basic_datagram_socket.hpp>
+#include "netkits.h"
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
 #include <ctools/error/error.hpp>
 #include <iostream>
+#include <netinet/in.h>
 #include <stdexcept>
 #include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/un.h>
 #include <unistd.h>
+#include <vector>
 namespace ctools {
 struct pipe {
     enum class pipe_code { read = 1000,
@@ -71,13 +75,13 @@ public:
     }
 };
 
-pipe& operator>>(pipe& origin, std::string& target)
+inline pipe& operator>>(pipe& origin, std::string& target)
 {
     // printf("start read from pipe\n");
     target = origin.read_tostr();
     return origin;
 }
-pipe& operator<<(pipe& origin, std::string data)
+inline pipe& operator<<(pipe& origin, std::string data)
 {
     // printf("start write to pipe\n");
     origin.write(data);
@@ -103,31 +107,59 @@ public:
     virtual error bad_response() = 0;
 };
 }
-
+namespace ctools {
+namespace context {
+    static int top_id = 0;
+    inline std::vector<ctools::Server> task_array;
+}
+}
 namespace ctools {
 namespace net {
+
 // static size_t buffer_size = 10 << 10;
 #define buffer_size 10 << 10
-    void DoIt(boost::asio::ip::tcp::socket* soc, bool* isclose, bool needwait)
-    {
-        char inbuffer[buffer_size];
-        boost::system::error_code ec;
-        while (!(*isclose)) {
-            ec.clear();
-            if (strlen(inbuffer) > 0) memset(inbuffer, 0, sizeof(char) * strlen(inbuffer));
-            soc->read_some(boost::asio::buffer(inbuffer), ec);
-        }
-    }
     enum class socktype { TCP = 999,
         UDP = 888,
         UNIX = 777 };
-    void listenandserve_tcp(socktype sc, std::string address, conn (*regfunc)(boost::asio::ip::tcp::socket), pipe* errpipe)
+    void listen_and_serve(const socktype sc, int* task_id, const int port = 8000, const char* addr = "");
+    void ProCon(const int conid, const int task_id);
+    inline void ProCon(const int conid, const int task_id)
     {
-        // todo compelete common listen and serve
+        Server& ser = context::task_array[task_id];
+        ser.register_con(conid);
+        ser.Do();
+        ser.safety_exit();
     }
-    void listenandserve_udp(socktype sc, std::string address, conn (*regfunc)(boost::asio::ip::udp::socket), pipe* errpipe)
+    inline void listen_and_serve(const socktype sc, int* task_id, const int port, const char* addr)
     {
-        // todo compelete common listen and serve
+        *task_id = context::top_id++;
+        int sock_type = (sc == socktype::UDP) ? SOCK_DGRAM : SOCK_STREAM;
+        int sock_type_ = (sc == socktype::UNIX) ? AF_UNIX : AF_INET;
+        struct sockaddr* sa;
+        size_t sizelen;
+        if (sc != socktype::UNIX) {
+            struct sockaddr_in sce;
+            sce.sin_family = AF_INET;
+            sce.sin_addr.s_addr = INADDR_ANY;
+            sce.sin_port = htons(port);
+            sa = (struct sockaddr*)&sce;
+            sizelen = sizeof(struct sockaddr_in);
+        } else {
+            struct sockaddr_un su;
+            su.sun_family = AF_UNIX;
+            if (strlen(addr) < 1) throw std::logic_error("not set address");
+            sa = (struct sockaddr*)&su;
+            sizelen = sizeof(struct sockaddr_un);
+        }
+        int sid = socket(sock_type_, sock_type, 0);
+        if (bind(sid, sa, sizelen) == -1) throw std::logic_error("bind failed");
+        if (listen(sid, 0) == -1) throw std::logic_error("listen failed");
+        int conid;
+        while (true) {
+            conid = accept(conid, NULL, NULL);
+            if (*task_id >= context::task_array.size()) throw std::logic_error("not bind the server class");
+            context::task_array[*task_id].Do();
+        }
     }
 }
 }

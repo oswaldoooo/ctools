@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <fcntl.h>
 #include <memory>
 #include <unistd.h>
@@ -14,13 +15,31 @@ inline int stdfd = STDOUT_FILENO;
 #define default_template "[%s] %s %s"
 #define default_template_two "[%s] %s"
 #define default_template_three "[%s]"
+#define logout_with_prefix(x, y) outputplus_(x, y, __FILE__, __LINE__, __func__)
+// output log info to stdout
+#define logout(x) logout_(x, STDOUT_FILENO, __FILE__, __LINE__, __func__)
+// output log info to target file
+#define logout2(x, y) logout_(x, y, __FILE__, __LINE__, __func__)
+#define debugout() debugOut(__FILE__, __LINE__, __func__)
+// need free ans
+inline const char* debugOut(const char* file, const int line, const char* funcname)
+{
+    char* ans = new char[50];
+    memset(ans, 0, 50);
+    time_t ti = time(NULL);
+    char* timestr = ctime(&ti);
+    timestr[strlen(timestr) - 1] = 0;
+    snprintf(ans, 50, "%s %s:%s:%d", timestr, file, funcname, line);
+    return ans;
+}
 struct prefix {
     std::string prefixname;
     bool time;
     std::vector<std::string> tags;
-    std::string string() const
+    std::string string(const char* pfcontent = NULL) const
     {
         std::string ans;
+        if (pfcontent != NULL) ans = pfcontent;
         if (!prefixname.empty()) {
             ans += "[" + prefixname + "] ";
         }
@@ -64,7 +83,17 @@ inline void outputwithprefix(struct prefix* pf, const char* data)
     printf("prepare input data %s\n", pf->string().c_str());
     write(stdfd, finalans.c_str(), sizeof(char) * finalans.length());
 }
-
+inline int outputplus_(struct prefix* pf, const char* data, const char* filename, const int line, const char* funcname)
+{
+    char content[50];
+    memset(content, 0, 50);
+    snprintf(content, 50, "%s:%s:%d ", filename, funcname, line);
+    std::string finalans;
+    finalans = pf->string(content).c_str();
+    finalans += data;
+    write(stdfd, finalans.c_str(), finalans.length());
+    return 0;
+}
 // new outputer,use outputer output to file or terminal.
 class Outputer {
 private:
@@ -75,6 +104,12 @@ private:
 public:
     Outputer() { fid = STDOUT_FILENO; }
     Outputer(int tfid) { fid = tfid; }
+    ~Outputer()
+    {
+        if (fid != STDOUT_FILENO) {
+            close(fid);
+        }
+    }
     Outputer(const char* filepath)
     {
         fid = open(filepath, O_WRONLY | O_CREAT | O_APPEND, 0600);
@@ -116,3 +151,15 @@ public:
         return ans;
     }
 };
+// out to target file description,format time file_name:function_name:line_number
+inline int logout_(const char* data, const int fid, const char* filename, const int line, const char* funname)
+{
+    char datafinal[strlen(data) + 70];
+    memset(datafinal, 0, strlen(data) + 70);
+    time_t ti = time(NULL);
+    char* timstr = ctime(&ti);
+    timstr[strlen(timstr) - 1] = 0;
+    snprintf(datafinal, strlen(data) + 70, "%s %s:%s:%d %s\n", timstr, filename, funname, line, data);
+    write(fid, datafinal, strlen(datafinal));
+    return 0;
+}

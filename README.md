@@ -11,6 +11,20 @@ wget https://brotherhoodhk.org/products/shells/ctools_uninstall.sh
 sudo bash ctools_uninstall.sh
 ```
 ## **New Features**
+#### **Logger Use** 30 August 2023
+```cpp
+#include <ctools/output.hpp>
+int main(){
+    //this will output to stdout directly
+    logout("hello ctools!");
+    //this will write to test.log
+    int fid=open("test.log", O_CREAT | O_WRONLY | O_APPEND, 0640);
+    if (fid < 0) throw std::logic_error("open test.log failed");
+    logout("hello ctools!",fid);
+    close(fid);
+    return 0;
+}
+```
 #### **Net-Kits and New FIFO** 6 july 2023
 add the fifo class and netkits header.them all are header-only.
 examples here

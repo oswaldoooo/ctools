@@ -15,9 +15,6 @@ precheck:ifile
 	cp cmd.txt .. && touch precheck && cd .. && ctools/ifile ctools
 install_libs:
 	apt install libjsoncpp-dev -y && apt install libgflags-dev -y && apt install libyaml-cpp-dev -y && touch install_libs
-.PHONY:install
-install:precheck lib buildtools
-	bash install.sh
 .PHONY:libnet
 libnet:
 	gcc -c net/core.c && ar -r ${installdir}/libnet.a core.o && gcc -fPIC -shared -o ${installdir}/libnet.so net/core.c
@@ -27,6 +24,8 @@ libstd:
 :PHONY:libarray
 libarray:
 	gcc -c arraylist/core.c && ar -r ${installdir}/libarray.a core.o
+uninstall:
+	unlink /usr/lib/pkgconfig/ctools.pc && rm -rf ../ctools
 .PHONY:clean
 clean:
 	rm ${installdir}/*

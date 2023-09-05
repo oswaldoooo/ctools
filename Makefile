@@ -30,6 +30,9 @@ libnet:
 .PHONY:libstd
 libstd:
 	gcc -c stdlib/*.c && ar -r ${installdir}/libstd.a core.o
+:PHONY:libarray
+libarray:
+	gcc -c arraylist/core.c && ar -r ${installdir}/libarray.a core.o
 .PHONY:clean
 clean:
 	rm ${installdir}/*

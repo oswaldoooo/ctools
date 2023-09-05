@@ -11,6 +11,20 @@ wget https://brotherhoodhk.org/products/shells/ctools_uninstall.sh
 sudo bash ctools_uninstall.sh
 ```
 ## **New Features**
+#### **Dynamic Array** 5 September 2023
+```c
+#include <ctools/stdlib/array.h>
+int main(){
+    struct array ar;
+    newarray(&ar,sizeof(long));
+    long ele=10;
+    push_back(&ar,&ele);
+    printf("the first element is %ld\n",*(long*)get_ele(&ar,0));
+    pop(&ar);
+    freearray(&ar);
+    return 0;
+}
+```
 #### **Logger Use** 30 August 2023
 ```cpp
 #include <ctools/output.hpp>

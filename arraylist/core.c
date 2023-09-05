@@ -36,3 +36,19 @@ void freearray(struct array* src)
 {
     free(src->head);
 }
+
+void remove_ele(struct array* src, size_t pos)
+{
+    if (pos < src->curr_size) {
+        memmove(src->head + pos * src->sigsize, src->head + (pos + 1) * src->sigsize, (src->curr_size - pos - 1) * src->sigsize);
+        src->curr_size--;
+    }
+}
+void dup_array(struct array* dst, struct array* src)
+{
+    dst->capsize = src->capsize;
+    dst->curr_size = src->curr_size;
+    dst->sigsize = src->sigsize;
+    dst->head = malloc(sizeof(dst->sigsize) * dst->capsize);
+    memmove(dst->head, src->head, sizeof(src->sigsize) * src->capsize);
+}

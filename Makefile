@@ -29,7 +29,7 @@ libnet:
 	gcc -c net/core.c && ar -r ${installdir}/libnet.a core.o && gcc -fPIC -shared -o ${installdir}/libnet.so net/core.c
 .PHONY:libstd
 libstd:
-	gcc -c stdlib/*.c && ar -r ${installdir}/libstd.a core.o
+	gcc -c stdlib/*.c arraylist/*.c && ar -r ${installdir}/libstd.a core.o
 :PHONY:libarray
 libarray:
 	gcc -c arraylist/core.c && ar -r ${installdir}/libarray.a core.o

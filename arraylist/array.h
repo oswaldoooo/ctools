@@ -16,6 +16,8 @@ void push_back(struct array*, void*);
 void* get_ele(struct array*, size_t);
 void pop(struct array*);
 void freearray(struct array*);
+void remove_ele(struct array*, size_t);
+void dup_array(struct array* dst, struct array* src);
 #ifdef __cplusplus
 }
 #endif

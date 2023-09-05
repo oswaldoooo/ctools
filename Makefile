@@ -1,16 +1,17 @@
+installdir=lib
 all:lib buildtools buildmarsha
 	echo installall
-lib:
-	mkdir lib
+lib:libnet libstd
+	@echo "library build success"
 .PHONY:buildtools
 buildtools:
-	g++ -o lib/libtools.so -std=c++17 tools/tools.cpp tools/cinsecure.cpp error/error.cpp -I.. -I.
+	g++ -o ${installdir}/libtools.so -std=c++17 tools/tools.cpp tools/cinsecure.cpp error/error.cpp -I.. -I.
 .PHONY:buildmarsha
 buildmarsha:
-	g++ -o lib/libmarshal.so -shared -fPIC show.cc -I.. -ljsoncpp -std=c++17
+	g++ -o ${installdir}/libmarshal.so -shared -fPIC show.cc -I.. -ljsoncpp -std=c++17
 .PHONY:buildtest
 buildtest:
-	g++ -o test app.cc show.cc -ljsoncpp -I.. -std=c++17 -g
+	g++ -o bin/newtest lab/test.cc -std=c++17 -g
 .PHONY:bsclient
 bsclient:
 	g++ -o bsclient app.cc show.cc -ljsoncpp -I. -I.. -std=c++17
@@ -23,6 +24,15 @@ installlib:
 .PHONY:install
 install:precheck lib buildtools buildmarsha
 	bash install.sh
+.PHONY:libnet
+libnet:
+	gcc -c net/core.c && ar -r ${installdir}/libnet.a core.o && gcc -fPIC -shared -o ${installdir}/libnet.so net/core.c
+.PHONY:libstd
+libstd:
+	gcc -c stdlib/*.c && ar -r ${installdir}/libstd.a core.o
 .PHONY:clean
 clean:
-	rm lib/*
+	rm ${installdir}/*
+.PHONY:clear
+clear:
+	rm *.o

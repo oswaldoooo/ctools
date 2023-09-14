@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/poll.h>
 #include <sys/types.h>
 #include <time.h>
 int print(FILE* fl, const char* src, const char* filename, const int line, const char* funname)
@@ -62,4 +63,75 @@ const char* formatInt(int data)
         memmove(global_mem, ti, level);
     }
     return global_mem;
+}
+
+// poll enhanced
+#define DEFAULT_POLL_SIZE 30
+struct poll_pool {
+    unsigned curr_top;
+    unsigned max_top;
+    struct pollfd* src;
+};
+static struct poll_pool polls_pool[10];
+static unsigned polls_top = 0;
+int poll_create(uint32_t max)
+{
+    max = (max == 0) ? DEFAULT_POLL_SIZE : max;
+    polls_pool[polls_top].curr_top = 0;
+    polls_pool[polls_top].max_top = max;
+    polls_pool[polls_top].src = malloc(sizeof(struct pollfd) * max);
+    return polls_top++;
+}
+int poll_add(int pollid, int fd, short events)
+{
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    if (pl->curr_top >= pl->max_top) return -2;
+    pl->src[pl->curr_top].fd = fd;
+    pl->src[pl->curr_top].events = events;
+    pl->curr_top++;
+    return 0;
+}
+int poll_del(int pollid, int fd)
+{
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    if (pl->curr_top == 0) return -2;
+    for (size_t i = 0; i < pl->curr_top; i++) {
+        if (pl->src[i].fd == fd) {
+            memmove(pl->src + i * sizeof(struct pollfd), pl->src + (i + 1) * sizeof(struct pollfd), (pl->curr_top - i - 1) * sizeof(struct pollfd));
+            break;
+        }
+    }
+    pl->curr_top--;
+    return 0;
+}
+int poll_wait(int pollid, struct pollfd* dst, size_t max, unsigned timeout)
+{
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    int to = (timeout == 0) ? -1 : timeout;
+    poll(pl->src, pl->curr_top, to);
+    unsigned start = 0;
+    for (size_t i = 0; i < pl->curr_top; i++) {
+        if (pl->src[i].fd > 0 && start < max && (pl->src[i].events & pl->src[i].revents)) {
+            dst[start++] = pl->src[i];
+        }
+    }
+    return start;
+}
+int poll_free(int pollid)
+{
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    if (pollid < polls_top - 1) {
+        memmove(polls_pool + pollid * sizeof(struct poll_pool), polls_pool + (pollid + 1) * sizeof(struct poll_pool), (polls_top - pollid - 1) * sizeof(struct poll_pool));
+    }
+    free(pl->src);
+    polls_top--;
+    return 0;
 }

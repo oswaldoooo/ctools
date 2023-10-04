@@ -3,6 +3,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// initial error
+void init_error(struct error* err)
+{
+    err->core = NULL;
+}
+void init_error_list(struct error** err, size_t length)
+{
+    if (length < 1) return;
+    for (size_t i = 0; i < length; i++) {
+        err[i] = malloc(sizeof(struct error));
+        init_error(err[i]);
+    }
+}
+size_t err_len(struct error** src, size_t cap_len)
+{
+    for (size_t i = 0; i < cap_len; i++) {
+        if (src[i]->core == NULL) {
+            return i;
+        }
+    }
+    return cap_len;
+}
 // set value to error
 void errorf(struct error* src, const char* words)
 {

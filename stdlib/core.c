@@ -135,3 +135,47 @@ int poll_free(int pollid)
     polls_top--;
     return 0;
 }
+
+long Pow(long src, uint8_t step)
+{
+    long ans = 1;
+    if (src == 0) return 0;
+    if (step == 0) return ans;
+    for (size_t i = 0; i < step; i++) {
+        ans *= src;
+    }
+    return ans;
+}
+u_int64_t Uint64(u_char* src, size_t length)
+{
+    length = (length > 8) ? 8 : length;
+    length = (strlen((char*)src) < length) ? strlen((char*)src) : length;
+    u_int32_t ans = 0;
+    if (length == 0) return ans;
+    for (size_t i = 0; i < length; i++) {
+        ans += src[i] * Pow(256, length - i - 1);
+    }
+    return ans;
+}
+u_int32_t Uint32(u_char* src, size_t length)
+{
+    length = (length > 4) ? 4 : length;
+    length = (strlen((char*)src) < length) ? strlen((char*)src) : length;
+    u_int32_t ans = 0;
+    if (length == 0) return ans;
+    for (size_t i = 0; i < length; i++) {
+        ans += src[i] * Pow(256, length - i - 1);
+    }
+    return ans;
+}
+u_int16_t Uint16(u_char* src, size_t length)
+{
+    length = (length > 2) ? 2 : length;
+    length = (strlen((char*)src) < length) ? strlen((char*)src) : length;
+    u_int32_t ans = 0;
+    if (length == 0) return ans;
+    for (size_t i = 0; i < length; i++) {
+        ans += src[i] * Pow(256, length - i - 1);
+    }
+    return ans;
+}

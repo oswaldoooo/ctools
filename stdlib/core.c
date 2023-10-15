@@ -1,4 +1,6 @@
 #include "io.h"
+#include "math.h"
+#include "poll.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

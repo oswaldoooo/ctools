@@ -3,7 +3,7 @@
 #ifndef tools_h
 #define tools_h
 #include <algorithm>
-#include <ctools/stdlib/error.h>
+#include <ctools/stdlib/error.hpp>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -16,7 +16,7 @@ enum class ans_mod { normal,
 template <typename T>
 struct Ans {
     T object;
-    error err;
+    logic_error err;
     Ans();
     Ans(T val)
         : object(val)
@@ -46,7 +46,7 @@ struct Ansunique {
     bool isobject;
     bool isobjectarr;
     ans_mod md = ans_mod::normal;
-    error err;
+    logic_error err;
     Ansunique(ans_mod newmod = ans_mod::normal)
     {
         md = newmod;
@@ -90,12 +90,12 @@ struct Ansunique {
 template <typename T>
 struct AnsVec {
     std::vector<T> object;
-    error err;
+    logic_error err;
 };
 template <typename T, typename E>
 struct AnsMap {
     std::map<T, E> object;
-    error err;
+    logic_error err;
 };
 template <class T>
 std::map<T, none>* arrayTomap(const T* src, int langth);

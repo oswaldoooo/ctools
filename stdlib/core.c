@@ -1,6 +1,10 @@
 #include "io.h"
+#include "math.h"
+#include "poll.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/poll.h>
 #include <sys/types.h>
 #include <time.h>
 #include <stdbool.h>
@@ -64,65 +68,119 @@ const char* formatInt(int data)
     return global_mem;
 }
 
-bool verify(const char* src, unsigned short types_info)
+
+// poll enhanced
+#define DEFAULT_POLL_SIZE 30
+struct poll_pool {
+    unsigned curr_top;
+    unsigned max_top;
+    struct pollfd* src;
+};
+static struct poll_pool polls_pool[10];
+static unsigned polls_top = 0;
+int poll_create(uint32_t max)
 {
-    switch (types_info) {
-    case INTEGER: {
-        int tians;
-        return Atoi(src, &tians);
-    } break;
-    case UINTEGER: {
-        int tians;
-        return (Atoi(src, &tians) && tians >= 0);
-    } break;
-    case BOOLEAN: {
-        return (!strncmp(src, "true", 4) || !strncmp(src, "false", 5) || (strlen(src) == 1) && (src[0] == '1' || src[0] == '0'));
-    } break;
-    case IPADDR: {
-        unsigned short pos = 0;
-        unsigned short tival = 0;
-        unsigned short total = 0;
-        if (strlen(src) < 7 || strlen(src) > 15) return false;
-        for (size_t i = 0; i < strlen(src); i++) {
-            if (src[i] == '.') {
-                pos = 0;
-                tival = 0;
-                total++;
-            } else if (src[i] >= '0' && src[i] <= '9' && pos < 3) {
-                pos++;
-                tival *= 10;
-                tival += src[i] - '0';
-                if (tival >= 256) return false;
-            } else {
-                return false;
-            }
-        }
-        return total == 3;
-    } break;
-    default:
-        return false;
-    }
-    return true;
+    max = (max == 0) ? DEFAULT_POLL_SIZE : max;
+    polls_pool[polls_top].curr_top = 0;
+    polls_pool[polls_top].max_top = max;
+    polls_pool[polls_top].src = malloc(sizeof(struct pollfd) * max);
+    return polls_top++;
 }
-bool Atoi(const char* src, int* dst)
+int poll_add(int pollid, int fd, short events)
 {
-    bool neg = false;
-    if (strlen(src) < 1) return 0;
-    if (src[0] == '+' && strlen(src) > 1) {
-        src++;
-    } else if (src[0] == '-' && strlen(src) > 1) {
-        src++;
-        neg = true;
-    }
-    *dst = 0;
-    for (size_t i = 0; i < strlen(src); i++) {
-        if (src[i] >= '0' && src[i] <= '9') {
-            (*dst) *= 10;
-            (*dst) += src[i] - '0';
-        } else {
-            return false;
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    if (pl->curr_top >= pl->max_top) return -2;
+    pl->src[pl->curr_top].fd = fd;
+    pl->src[pl->curr_top].events = events;
+    pl->curr_top++;
+    return 0;
+}
+int poll_del(int pollid, int fd)
+{
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    if (pl->curr_top == 0) return -2;
+    for (size_t i = 0; i < pl->curr_top; i++) {
+        if (pl->src[i].fd == fd) {
+            memmove(pl->src + i * sizeof(struct pollfd), pl->src + (i + 1) * sizeof(struct pollfd), (pl->curr_top - i - 1) * sizeof(struct pollfd));
+            break;
         }
     }
-    if (neg) *dst = -(*dst);
-    return true;
+    pl->curr_top--;
+    return 0;
 }
+int poll_wait(int pollid, struct pollfd* dst, size_t max, unsigned timeout)
+{
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    int to = (timeout == 0) ? -1 : timeout;
+    poll(pl->src, pl->curr_top, to);
+    unsigned start = 0;
+    for (size_t i = 0; i < pl->curr_top; i++) {
+        if (pl->src[i].fd > 0 && start < max && (pl->src[i].events & pl->src[i].revents)) {
+            dst[start++] = pl->src[i];
+        }
+    }
+    return start;
+}
+int poll_free(int pollid)
+{
+    if (pollid >= polls_top) return -1;
+    struct poll_pool* pl;
+    pl = &polls_pool[pollid];
+    if (pollid < polls_top - 1) {
+        memmove(polls_pool + pollid * sizeof(struct poll_pool), polls_pool + (pollid + 1) * sizeof(struct poll_pool), (polls_top - pollid - 1) * sizeof(struct poll_pool));
+    }
+    free(pl->src);
+    polls_top--;
+    return 0;
+}
+
+long Pow(long src, uint8_t step)
+{
+    long ans = 1;
+    if (src == 0) return 0;
+    if (step == 0) return ans;
+    for (size_t i = 0; i < step; i++) {
+        ans *= src;
+    }
+    return ans;
+}
+u_int64_t Uint64(u_char* src, size_t length)
+{
+    length = (length > 8) ? 8 : length;
+    length = (strlen((char*)src) < length) ? strlen((char*)src) : length;
+    u_int32_t ans = 0;
+    if (length == 0) return ans;
+    for (size_t i = 0; i < length; i++) {
+        ans += src[i] * Pow(256, length - i - 1);
+    }
+    return ans;
+}
+u_int32_t Uint32(u_char* src, size_t length)
+{
+    length = (length > 4) ? 4 : length;
+    length = (strlen((char*)src) < length) ? strlen((char*)src) : length;
+    u_int32_t ans = 0;
+    if (length == 0) return ans;
+    for (size_t i = 0; i < length; i++) {
+        ans += src[i] * Pow(256, length - i - 1);
+    }
+    return ans;
+}
+u_int16_t Uint16(u_char* src, size_t length)
+{
+    length = (length > 2) ? 2 : length;
+    length = (strlen((char*)src) < length) ? strlen((char*)src) : length;
+    u_int32_t ans = 0;
+    if (length == 0) return ans;
+    for (size_t i = 0; i < length; i++) {
+        ans += src[i] * Pow(256, length - i - 1);
+    }
+    return ans;
+}
+

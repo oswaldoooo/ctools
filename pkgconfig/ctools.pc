@@ -1,0 +1,9 @@
+prefix=?
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name:ctools
+Version: 1.1
+Description:ctools,toolsbox library for c/cpp
+Cflags:-I${prefix}/include
+Libs:-L${prefix}/lib -lnet

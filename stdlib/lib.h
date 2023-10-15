@@ -1,4 +1,5 @@
 #pragma once
+
 #include <stddef.h>
 #ifndef OS
 #define OS 1
@@ -17,3 +18,4 @@ enum error_leve {
 // need in bsd or darwin, don't support for linux
 void release_unused_shm();
 #endif
+

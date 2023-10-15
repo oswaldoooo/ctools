@@ -7,6 +7,7 @@
 #include <sys/poll.h>
 #include <sys/types.h>
 #include <time.h>
+#include <stdbool.h>
 int print(FILE* fl, const char* src, const char* filename, const int line, const char* funname)
 {
     if (src == NULL || strlen(src) == 0) return -1;
@@ -66,6 +67,7 @@ const char* formatInt(int data)
     }
     return global_mem;
 }
+
 
 // poll enhanced
 #define DEFAULT_POLL_SIZE 30
@@ -181,3 +183,4 @@ u_int16_t Uint16(u_char* src, size_t length)
     }
     return ans;
 }
+

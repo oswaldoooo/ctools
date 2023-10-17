@@ -183,4 +183,15 @@ u_int16_t Uint16(u_char* src, size_t length)
     }
     return ans;
 }
-
+const unsigned char* put_uint(unsigned long src)
+{
+    memset(global_mem, 0, 512);
+    unsigned i = 0;
+    while (src > 0) {
+        global_mem[i] = src % 256;
+        i++;
+        src /= 256;
+        printf("val %d,pos %d,src %ld\n", global_mem[i - 1], i, src);
+    }
+    return (unsigned char*)global_mem;
+}

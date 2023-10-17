@@ -11,6 +11,7 @@ static char global_mem[512];
 const char* format_byte_tostr(uint64_t);
 const char* formatInt(int);
 const char* itoa(int);
+const unsigned char* put_uint(unsigned long);
 #ifdef __cplusplus
 }
 #endif

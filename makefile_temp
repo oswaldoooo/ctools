@@ -1,4 +1,5 @@
 installdir=?
+Platform=Linux
 all:lib buildtools
 	echo installall
 lib:libnet libstd
@@ -30,5 +31,12 @@ uninstall:
 clean:
 	rm ${installdir}/*
 .PHONY:clear
+iomuti:
+ifeq (Platform,"Linux")
+	@echo "build linux iomuti"
+else ifeq (Platform,Bsd)
+	@echo "build bsd iomuti"
+endif
+	@echo "build iomutifinished"
 clear:
 	rm *.o

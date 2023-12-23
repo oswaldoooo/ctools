@@ -1,4 +1,5 @@
 installdir=lib
+Platform=Linux
 all:lib buildtools buildmarsha
 	echo installall
 lib:libnet libstd
@@ -33,9 +34,17 @@ libstd:
 :PHONY:libarray
 libarray:
 	gcc -c arraylist/core.c && ar -r ${installdir}/libarray.a core.o
-.PHONY:clean
+.PHONY:clean iomuti
 clean:
 	rm ${installdir}/*
+iomuti:
+ifeq ($(Platform),Linux)
+	gcc -c net/iomuti_linux.c -o $@.o
+else ifeq ($(Platform),Bsd)
+	gcc -c net/iomuti_bsd.c  -o $@.o
+endif
+	ar -r $(installdir)/lib$@.a $@.o
+	@echo "build $(Platform) iomutifinished"
 .PHONY:clear
 clear:
 	rm *.o
